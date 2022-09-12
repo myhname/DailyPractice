@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS封装Ajax请求</title>
+</head>
+<body>
+    <script>
+        // 请求方式、请求地址、请求参数、请求参数类型（通过json交互）、请求结果
+        function ajaxTest(options){
+            console.log("ajaxx")
+            // 创建XHR对象
+            const xhr = new XMLHttpRequest();
+            // 初始化参数的内容
+            options = options || {}
+            options.type = (options.type || 'GET').toUpperCase()
+            options.dataType = options.dataType || 'json'
+            const params = options.data
+            // 发送请求
+            if(options.type === 'GET'){
+                xhr.open('GET',options.url+"?"+getParams(params),true)
+                xhr.send(null)
+            }else if(options.type === 'POST'){
+                xhr.open('POST',options.url,true)
+                xhr.send(params)
+            }
+            // 接受请求
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState === 4){
+                    if(xhr.status >= 200 && xhr.status < 300){
+                        options.success(xhr.responseText,xhr.responseXML)
+                    }else{
+                        options.fail("参数错误" + xhr.status)
+                    }
+                }
+            }
+        }
+        console.log("xxx")
+        ajaxTest({
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                //会变成对象，没法直接选择id=1的那一组数据
+                id:1
+            },
+            url:'http://49.232.88.154:3030/posts',
+            success:function(text,xml){
+                //输出格式处理，json->对象
+                console.log(JSON.parse(text));
+            },
+            fail:function(status){
+                console.log(status);
+            }
+        })
+        function getParams(data){
+            let arr = [];
+            for(let key in data){
+                arr.push(`${key}=${data[key]}`)
+            }
+            return arr.join('&')
+        }
+        // getParams({id:1})
+    </script>
+</body>
+</html>
